@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Center - CyberShield 360</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Learning Center</h1>
+      <p>Advance your awareness with practical modules on phishing, banking safety, and digital security.</p>
+    </div>
+    <div class="row g-4" id="learningList"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderNavbar(true);
+    document.getElementById('sidebar-container').innerHTML = renderSidebar('learning');
+    initPage();
+
+    const list = document.getElementById('learningList');
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[character]);
+    }
+
+    async function loadLearning() {
+      showLoading();
+      const result = await apiGet(ENDPOINTS.LEARNING);
+      if (!result.success) {
+        hideLoading();
+        list.innerHTML = `<div class="col-12 text-secondary">${escapeHtml(result.message || 'Learning modules are unavailable.')}
+          <button class="btn-outline-cyber btn-sm ms-2" id="reloadLearning">Try again</button></div>`;
+        document.getElementById('reloadLearning').addEventListener('click', loadLearning);
+        return;
+      }
+
+      const modules = (result.data.items || []).filter(module => module.type !== 'cyber_law');
+      let progressByModule = {};
+      if (isLoggedIn()) {
+        const progressResult = await apiGet(`${ENDPOINTS.LEARNING}/progress`);
+        if (progressResult.success) {
+          progressByModule = Object.fromEntries((progressResult.data || []).map(item => [item.module_id, item.progress]));
+        }
+      }
+      hideLoading();
+
+      if (!modules.length) {
+        list.innerHTML = '<div class="col-12 text-secondary">No learning modules are currently available.</div>';
+        return;
+      }
+
+      list.innerHTML = modules.map(module => {
+        const progress = Math.max(0, Math.min(100, Number(progressByModule[module._id]) || 0));
+        return `
+        <div class="col-lg-6">
+          <div class="glass-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5>${escapeHtml(module.title)}</h5>
+                <p class="text-secondary small mb-0">${escapeHtml(module.category || 'Awareness')}</p>
+              </div>
+              <span class="badge bg-danger bg-opacity-25 text-danger">${escapeHtml(module.duration || '15 min')}</span>
+            </div>
+            <p class="text-secondary">${escapeHtml(module.description || module.content?.slice(0, 140))}</p>
+            <div class="progress-cyber mt-3">
+              <div class="progress-bar" style="width: ${progress}%;"></div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2 small text-secondary"><span>${progress}% complete</span>${progress === 100 ? '<span><i class="fas fa-check me-1"></i>Completed</span>' : ''}</div>
+            <button class="btn-cyber mt-3 open-module" data-module-id="${escapeHtml(module._id)}">${progress === 100 ? '<i class="fas fa-book-open me-2"></i>Review Module' : '<i class="fas fa-play me-2"></i>Open Module'}</button>
+          </div>
+        </div>
+      `;
+      }).join('');
+
+      list.querySelectorAll('.open-module').forEach(button => {
+        button.addEventListener('click', () => openModule(button.dataset.moduleId, modules, progressByModule));
+      });
+    }
+
+    async function openModule(moduleId, modules, progressByModule) {
+      const module = modules.find(item => item._id === moduleId);
+      if (!module) return;
+      const result = await Swal.fire({
+        title: escapeHtml(module.title),
+        html: `<p class="text-start text-secondary">${escapeHtml(module.description || '')}</p>
+          <div class="text-start" style="white-space:pre-line">${escapeHtml(module.content || 'Module content is not available.')}</div>`,
+        showCancelButton: true,
+        confirmButtonText: progressByModule[moduleId] === 100 ? 'Done' : 'Mark complete',
+        cancelButtonText: 'Close',
+        background: '#141A26', color: '#fff',
+        preConfirm: async () => {
+          if (progressByModule[moduleId] === 100) return true;
+          if (!isLoggedIn()) {
+            Swal.showValidationMessage('Please log in to save module progress.');
+            return false;
+          }
+          const update = await apiPost(`${ENDPOINTS.LEARNING}/${encodeURIComponent(moduleId)}/progress`, { progress: 100 });
+          if (!update.success) {
+            Swal.showValidationMessage(update.message || 'Progress could not be saved.');
+            return false;
+          }
+          return true;
+        }
+      });
+      if (result.isConfirmed && isLoggedIn() && progressByModule[moduleId] !== 100) loadLearning();
+    }
+
+    loadLearning();
+  </script>
+</body>
+</html>

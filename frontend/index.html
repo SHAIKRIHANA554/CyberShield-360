@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberShield 360 - Protect • Detect • Educate</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="/assets/css/main.css" rel="stylesheet">
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <canvas id="particles-canvas"></canvas>
+    <div class="hero-bg"></div>
+    <div class="container hero-content">
+      <div class="row align-items-center min-vh-100 py-5">
+        <div class="col-lg-6" data-aos="fade-right">
+          <p class="tagline mb-3">Protect • Detect • Educate</p>
+          <h1 class="display-4 fw-bold mb-4" style="font-family:Poppins">AI-Powered<br><span style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Cybersecurity</span><br>Platform</h1>
+          <p class="lead text-secondary mb-4">Detect phishing attacks, scam messages, fake websites, malicious QR codes, and cyber threats using Artificial Intelligence, Machine Learning, and Computer Vision.</p>
+          <div class="d-flex flex-wrap gap-3 mb-5">
+            <a href="/pages/register.html" class="btn-cyber btn-lg"><i class="fas fa-rocket me-2"></i>Get Started Free</a>
+            <a href="/pages/url-scanner.html" class="btn-outline-cyber btn-lg"><i class="fas fa-search me-2"></i>Scan Now</a>
+          </div>
+          <div class="row g-4">
+            <div class="col-4">
+              <div class="stat-value counter text-danger" id="stat-users">0</div>
+              <div class="text-secondary small">Users Protected</div>
+            </div>
+            <div class="col-4">
+              <div class="stat-value counter text-warning" id="stat-threats">0</div>
+              <div class="text-secondary small">Threats Blocked</div>
+            </div>
+            <div class="col-4">
+              <div class="stat-value counter text-info" id="stat-scans">0</div>
+              <div class="text-secondary small">Total Scans</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 text-center" data-aos="fade-left">
+          <div class="shield-animation">
+            <div class="shield-ring"></div>
+            <div class="shield-ring" style="animation-delay:0.5s"></div>
+            <div class="shield-core"><i class="fas fa-shield-alt"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-5">
+    <div class="container py-5">
+      <div class="text-center mb-5" data-aos="fade-up">
+        <p class="tagline mb-2">Capabilities</p>
+        <h2 class="fw-bold">Powerful Security Features</h2>
+        <p class="text-secondary">Comprehensive threat detection powered by AI & Machine Learning</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <a href="/pages/image-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-camera"></i></div>
+              <h5>Camera Scanner</h5>
+              <p class="text-secondary small mb-0">Scan threats in real-time using your device camera with YOLOv8 detection</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="150">
+          <a href="/pages/image-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-image"></i></div>
+              <h5>Image Scanner</h5>
+              <p class="text-secondary small mb-0">Upload images for OCR, scam detection, and fake screenshot analysis</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <a href="/pages/ocr-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+              <h5>OCR Scanner</h5>
+              <p class="text-secondary small mb-0">Extract text, URLs, UPI IDs, and bank details using EasyOCR</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="250">
+          <a href="/pages/qr-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-qrcode"></i></div>
+              <h5>QR Scanner</h5>
+              <p class="text-secondary small mb-0">Detect and analyze QR codes for malicious URLs and phishing</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+          <a href="/pages/url-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-link"></i></div>
+              <h5>URL Checker</h5>
+              <p class="text-secondary small mb-0">Analyze URLs with Random Forest ML model for phishing detection</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="350">
+          <a href="/pages/email-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-envelope"></i></div>
+              <h5>Email Scanner</h5>
+              <p class="text-secondary small mb-0">Detect phishing, spam, and malware in email content</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+          <a href="/pages/sms-scanner.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-sms"></i></div>
+              <h5>SMS Scanner</h5>
+              <p class="text-secondary small mb-0">BERT-powered scam message detection for OTP, bank, and lottery fraud</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="450">
+          <a href="/pages/news.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-newspaper"></i></div>
+              <h5>Cyber News</h5>
+              <p class="text-secondary small mb-0">Latest cybersecurity news, breach alerts, and government advisories</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+          <a href="/pages/learning.html" class="text-decoration-none">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+              <h5>Learning Center</h5>
+              <p class="text-secondary small mb-0">Cyber awareness modules, quizzes, and certificates</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-5" style="background:rgba(20,26,38,0.5)">
+    <div class="container py-5">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6" data-aos="fade-right">
+          <p class="tagline mb-2">Technology</p>
+          <h2 class="fw-bold mb-4">Enterprise-Grade AI Security</h2>
+          <p class="text-secondary mb-4">CyberShield 360 combines cutting-edge machine learning models including Random Forest, BERT, YOLOv8, CNN, and EasyOCR to provide comprehensive threat detection and cybersecurity education.</p>
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-success"></i><span class="small">Real-time Detection</span></div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-success"></i><span class="small">ML-Powered Analysis</span></div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-success"></i><span class="small">OCR & Computer Vision</span></div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2"><i class="fas fa-check-circle text-success"></i><span class="small">Awareness Training</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <div class="glass-card p-4">
+            <h5 class="mb-4"><i class="fas fa-microchip text-danger me-2"></i>ML Models Used</h5>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">Random Forest</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">BERT</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">DistilBERT</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">YOLOv8</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">CNN</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">EasyOCR</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">OpenCV</span>
+              <span class="badge bg-danger bg-opacity-25 text-danger p-2">TensorFlow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-5">
+    <div class="container py-5 text-center" data-aos="zoom-in">
+      <h2 class="fw-bold mb-3">Ready to Protect Yourself?</h2>
+      <p class="text-secondary mb-4">Join thousands of users securing their digital life with CyberShield 360</p>
+      <a href="/pages/register.html" class="btn-cyber btn-lg"><i class="fas fa-shield-alt me-2"></i>Start Protecting Now</a>
+    </div>
+  </section>
+
+  <div id="footer-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderNavbar();
+    document.getElementById('footer-container').innerHTML = renderFooter();
+    initPage();
+    initParticles();
+
+    apiGet(ENDPOINTS.GLOBAL_STATS).then(result => {
+      if (result.success) {
+        animateCounter(document.getElementById('stat-users'), result.data.users_protected);
+        animateCounter(document.getElementById('stat-threats'), result.data.threats_blocked);
+        animateCounter(document.getElementById('stat-scans'), result.data.total_scans);
+      }
+    });
+  </script>
+</body>
+</html>

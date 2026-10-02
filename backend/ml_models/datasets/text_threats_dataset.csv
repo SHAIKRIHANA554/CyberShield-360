@@ -1,0 +1,31 @@
+text,threat_category,label_name,label
+"Your HDFC Bank account credited with Rs. 15,000 via NEFT Ref 928374.",Legitimate,safe,0
+"Your OTP for SBI Netbanking login is 482910. Valid for 10 mins. Do not share with anyone.",Legitimate,safe,0
+"Your Amazon order #402-9182371 has been dispatched and will arrive tomorrow.",Legitimate,safe,0
+"Reminder: Your doctor appointment is scheduled for tomorrow at 10:00 AM.",Legitimate,safe,0
+"Your monthly statement for credit card ending 4092 is ready to view on app.",Legitimate,safe,0
+"Dear Customer, your electricity bill of Rs. 1420 has been paid successfully.",Legitimate,safe,0
+"Thank you for visiting CyberShield 360. Your awareness quiz score was 90%.",Legitimate,safe,0
+"Your Swiggy order delivery partner is on the way with your food.",Legitimate,safe,0
+"Flight booking confirmed for Mumbai to Delhi on 25th Aug. PNR: ABC123.",Legitimate,safe,0
+"Your Uber ride is arriving in 3 mins. Driver phone: 9876543210.",Legitimate,safe,0
+"Exclusive offer: Upgrade your broadband plan today and get 50% extra speed.",Promotional,warning,1
+"Limited time deal! Get 70% off on all electronics this weekend. Click here to browse.",Promotional,warning,1
+"Unusual sign-in attempt detected on your account from a new location. Verify if this was you.",Security Warning,warning,1
+"Your package delivery was delayed due to insufficient address details.",Delivery Notice,warning,1
+"You have received a new message on your online portal. Click link to read.",Notification,warning,1
+"Your subscription is expiring in 3 days. Renew now to avoid interruption.",Renewal,warning,1
+"Urgent: Share your OTP immediately with bank manager to unblock your HDFC account now!",OTP Scam,danger,2
+"Dear user, your SBI account is SUSPENDED due to missing KYC. Update PAN card at http://sbi-kyc.ml immediately or card will be blocked.",Bank Phishing,danger,2
+"Congratulations! You won Rs 25,00,000 in KBC Lucky Draw! Call manager at 9876543210 to claim prize now.",Lottery Scam,danger,2
+"Earn Rs 5000 daily working 1 hour from home! No experience required. Deposit Rs 500 registration fee at upi@scam.",Job Fraud,danger,2
+"URGENT: Your electricity connection will be disconnected tonight at 9:30 PM due to unpaid bill. Pay immediately at http://elect-pay.xyz",Utility Fraud,danger,2
+"Double your money in 24 hours! Guaranteed 200% return on crypto investment. Join Telegram t.me/crypto-scam",Investment Fraud,danger,2
+"Your Paytm Wallet has been blocked. Click http://paytm-unblock.top and enter debit card details to reactivate.",Payment Scam,danger,2
+"Dear Customer, your Income Tax refund of Rs. 35,400 is approved. Submit your bank account details at http://itr-refund.xyz",Tax Scam,danger,2
+"WARNING: Your SIM card will be deactivated in 2 hours. Submit Aadhaar copy to prevent deactivation.",Telecom Scam,danger,2
+"Important: Your parcel is held at customs. Pay customs fee of Rs 499 at http://courier-fee.site to release delivery.",Customs Fraud,danger,2
+"Your WhatsApp is expiring! Download WhatsApp Pink edition immediately to keep using messaging.",Malware Scam,danger,2
+"You have 1 unread voice message from customer care. Click http://voice-mail.info/listen to play audio.",Phishing Link,danger,2
+"Alert: Debit card charged Rs. 49,999 at Reliance Digital. If not done by you, click http://fraud-report.online to cancel.",Card Fraud,danger,2
+"Congratulations! You won an iPhone 15 Pro. Pay Rs 299 shipping charge to receive your gift.",Prize Scam,danger,2

@@ -1,0 +1,10 @@
+{
+  "name": "cybershield360",
+  "version": "1.0.0",
+  "description": "CyberShield 360 - AI-Powered Cybersecurity Threat Detection & Awareness Platform",
+  "main": "frontend/index.html",
+  "scripts": {
+    "start": "python -m http.server 5173 --directory frontend",
+    "dev": "python -m http.server 5173 --directory frontend"
+  }
+}

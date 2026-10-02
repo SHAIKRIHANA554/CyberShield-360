@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz - CyberShield 360</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Awareness Quiz</h1>
+      <p>Challenge your knowledge and improve your cyber resilience score.</p>
+    </div>
+    <div class="glass-card p-4" id="quizContainer"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderNavbar(true);
+    document.getElementById('sidebar-container').innerHTML = renderSidebar('quiz');
+    initPage();
+
+    const container = document.getElementById('quizContainer');
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[character]);
+    }
+
+    async function loadQuiz() {
+      showLoading();
+      const result = await apiGet(ENDPOINTS.QUIZ);
+      hideLoading();
+      const quizzes = result.success ? (result.data.items || []) : [];
+      if (!quizzes.length) {
+        container.innerHTML = `<p class="text-secondary">${escapeHtml(result.message || 'No quizzes are currently available.')}</p>
+          <button class="btn-outline-cyber btn-sm" id="reloadQuizzes">Try again</button>`;
+        document.getElementById('reloadQuizzes').addEventListener('click', loadQuiz);
+        return;
+      }
+
+      container.innerHTML = quizzes.map(quiz => `
+        <article class="border-bottom border-secondary border-opacity-10 py-3">
+          <h4>${escapeHtml(quiz.title)}</h4>
+          <p class="text-secondary">${escapeHtml(quiz.description || 'Test your cybersecurity awareness.')}</p>
+          <div class="d-flex flex-wrap gap-3 small text-secondary mb-3">
+            <span><i class="fas fa-circle-question me-1"></i>${quiz.questions?.length || 0} questions</span>
+            <span><i class="fas fa-clock me-1"></i>${Math.ceil((quiz.duration || 0) / 60)} minutes</span>
+          </div>
+          <button class="btn-cyber start-quiz" data-quiz-id="${escapeHtml(quiz._id)}"><i class="fas fa-play me-2"></i>Start Quiz</button>
+        </article>
+      `).join('');
+
+      container.querySelectorAll('.start-quiz').forEach(button => {
+        button.addEventListener('click', () => startQuiz(button.dataset.quizId));
+      });
+    }
+
+    async function startQuiz(quizId) {
+      if (!isLoggedIn()) {
+        const choice = await Swal.fire({
+          icon: 'info', title: 'Sign in to take the quiz',
+          text: 'Your answers and score are saved to your account.',
+          showCancelButton: true, confirmButtonText: 'Go to login',
+          background: '#141A26', color: '#fff'
+        });
+        if (choice.isConfirmed) window.location.href = '/pages/login.html';
+        return;
+      }
+
+      showLoading();
+      const result = await apiGet(`${ENDPOINTS.QUIZ}/${encodeURIComponent(quizId)}`);
+      hideLoading();
+      if (!result.success || !result.data.questions?.length) {
+        Swal.fire({ icon: 'error', title: 'Quiz unavailable', text: result.message || 'This quiz has no questions.', background: '#141A26', color: '#fff' });
+        return;
+      }
+
+      const quiz = result.data;
+      const startedAt = Date.now();
+      container.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+          <div><h3>${escapeHtml(quiz.title)}</h3><p class="text-secondary mb-0">${escapeHtml(quiz.description || '')}</p></div>
+          <button class="btn-outline-cyber btn-sm" id="backToQuizzes"><i class="fas fa-arrow-left me-1"></i>Quizzes</button>
+        </div>
+        <form id="quizForm">
+          ${quiz.questions.map((question, questionIndex) => `
+            <fieldset class="mb-4">
+              <legend class="h6">${questionIndex + 1}. ${escapeHtml(question.question)}</legend>
+              ${(question.options || []).map((option, optionIndex) => `
+                <label class="d-flex align-items-start gap-2 py-2">
+                  <input type="radio" name="question-${questionIndex}" value="${optionIndex}" required>
+                  <span>${escapeHtml(option)}</span>
+                </label>
+              `).join('')}
+            </fieldset>
+          `).join('')}
+          <button type="submit" class="btn-cyber"><i class="fas fa-check me-2"></i>Submit Answers</button>
+        </form>
+      `;
+      document.getElementById('backToQuizzes').addEventListener('click', loadQuiz);
+      document.getElementById('quizForm').addEventListener('submit', async event => {
+        event.preventDefault();
+        const answers = quiz.questions.map((_, index) => {
+          const selected = event.currentTarget.querySelector(`input[name="question-${index}"]:checked`);
+          return selected ? Number(selected.value) : null;
+        });
+        if (answers.some(answer => answer === null)) {
+          Swal.fire({ icon: 'warning', title: 'Answer every question', text: 'Choose one option for each question before submitting.', background: '#141A26', color: '#fff' });
+          return;
+        }
+
+        showLoading();
+        const submission = await apiPost(`${ENDPOINTS.QUIZ}/${encodeURIComponent(quizId)}/submit`, {
+          answers,
+          time_taken: Math.floor((Date.now() - startedAt) / 1000)
+        });
+        hideLoading();
+        if (!submission.success) {
+          Swal.fire({ icon: 'error', title: 'Could not submit quiz', text: submission.message, background: '#141A26', color: '#fff' });
+          return;
+        }
+
+        const score = submission.data;
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <i class="fas fa-award fa-3x text-warning mb-3"></i>
+            <h3>Quiz complete</h3>
+            <p class="lead">${score.score} of ${score.total} correct (${score.percentage}%)</p>
+            <p class="text-secondary">${score.percentage >= 80 ? 'Great work. Your awareness score has been updated.' : 'Review the learning modules and try again.'}</p>
+            <button class="btn-cyber" id="returnToQuizzes">Back to quizzes</button>
+          </div>
+        `;
+        document.getElementById('returnToQuizzes').addEventListener('click', loadQuiz);
+      });
+    }
+
+    loadQuiz();
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - CyberShield 360</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Security Command Center</h1>
+      <p>Monitor scans, review threat intelligence, and track your awareness growth.</p>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card glass-card">
+          <div class="stat-icon" style="background:rgba(0,200,83,0.15);color:var(--success)"><i class="fas fa-shield-alt"></i></div>
+          <div class="stat-value" id="total-scans">0</div>
+          <div class="stat-label">Total Scans</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card glass-card">
+          <div class="stat-icon" style="background:rgba(255,193,7,0.15);color:var(--warning)"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="stat-value" id="weekly-scans">0</div>
+          <div class="stat-label">Weekly Scans</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card glass-card">
+          <div class="stat-icon" style="background:rgba(230,57,70,0.15);color:var(--danger)"><i class="fas fa-bug"></i></div>
+          <div class="stat-value" id="threats-blocked">0</div>
+          <div class="stat-label">Threats Blocked</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card glass-card">
+          <div class="stat-icon" style="background:rgba(41,182,246,0.15);color:var(--info)"><i class="fas fa-graduation-cap"></i></div>
+          <div class="stat-value" id="awareness-score">0%</div>
+          <div class="stat-label">Awareness Score</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-xl-8">
+        <div class="chart-container glass-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Activity Trend</h5>
+            <span class="text-secondary small">Last 7 days</span>
+          </div>
+          <canvas id="activityChart"></canvas>
+        </div>
+      </div>
+      <div class="col-xl-4">
+        <div class="chart-container glass-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Threat Distribution</h5>
+            <span class="text-secondary small">By level</span>
+          </div>
+          <canvas id="threatChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="glass-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Recent Activity</h5>
+            <a href="/pages/notifications.html" class="small">View all</a>
+          </div>
+          <div id="activityFeed"></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="glass-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Recent Reports</h5>
+            <a href="/pages/reports.html" class="small">Open reports</a>
+          </div>
+          <div id="reportFeed"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+      <div class="col-12">
+        <div class="glass-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Cyber Crime News Feed</h5>
+            <a href="/pages/news.html" class="small">Open news</a>
+          </div>
+          <div id="newsFeed"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    if (!requireAuth()) {
+      window.location.href = '/pages/login.html';
+    }
+
+    document.getElementById('navbar-container').innerHTML = renderNavbar(true);
+    document.getElementById('sidebar-container').innerHTML = renderSidebar('dashboard');
+    initPage();
+
+    async function loadDashboard() {
+      showLoading();
+      const response = await apiGet(ENDPOINTS.STATS);
+      hideLoading();
+      if (!response.success) {
+        Swal.fire({ icon: 'error', title: 'Unable to load dashboard', text: response.message, background: '#141A26', color: '#fff' });
+        return;
+      }
+      const data = response.data;
+      document.getElementById('total-scans').textContent = data.threat_stats?.total_scans || 0;
+      document.getElementById('weekly-scans').textContent = data.threat_stats?.weekly_scans || 0;
+      document.getElementById('threats-blocked').textContent = data.threat_stats?.threats_blocked || 0;
+      document.getElementById('awareness-score').textContent = `${data.awareness_score || 0}%`;
+
+      const activityCtx = document.getElementById('activityChart').getContext('2d');
+      const threatCtx = document.getElementById('threatChart').getContext('2d');
+      const activityLabels = (data.threat_stats?.daily_scans || []).map(item => item.date);
+      const activityValues = (data.threat_stats?.daily_scans || []).map(item => item.count);
+      const threatDistribution = data.threat_stats?.threat_distribution || {};
+
+      new Chart(activityCtx, {
+        type: 'line',
+        data: {
+          labels: activityLabels,
+          datasets: [{ label: 'Scans', data: activityValues, borderColor: '#E63946', backgroundColor: 'rgba(230,57,70,0.2)', tension: 0.4, fill: true }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+      });
+
+      new Chart(threatCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(threatDistribution),
+          datasets: [{ data: Object.values(threatDistribution), backgroundColor: ['#00C853', '#FFC107', '#E63946'] }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+
+      const activities = data.recent_activities || [];
+      document.getElementById('activityFeed').innerHTML = activities.length ? activities.map(item => `
+        <div class="d-flex justify-content-between align-items-start py-2 border-bottom border-secondary border-opacity-10">
+          <div>
+            <div class="fw-semibold">${item.action || 'Activity'}</div>
+            <div class="small text-secondary">${item.details || item.module || 'Recent activity'}</div>
+          </div>
+          <div class="small text-secondary">${formatDate(item.created_at)}</div>
+        </div>
+      `).join('') : '<p class="text-secondary mb-0">No activity yet.</p>';
+
+      const reports = data.recent_reports || [];
+      document.getElementById('reportFeed').innerHTML = reports.length ? reports.map(item => `
+        <div class="d-flex justify-content-between align-items-start py-2 border-bottom border-secondary border-opacity-10">
+          <div>
+            <div class="fw-semibold">${item.threat_type || 'Threat Report'}</div>
+            <div class="small text-secondary">${item.recommendation || 'Review details'}</div>
+          </div>
+          <div>${getThreatBadge(item.threat_level || 'safe')}</div>
+        </div>
+      `).join('') : '<p class="text-secondary mb-0">No reports generated yet.</p>';
+
+      const newsResult = await apiGet(ENDPOINTS.NEWS);
+      const newsItems = newsResult.success ? (newsResult.data.items || []) : [];
+      document.getElementById('newsFeed').innerHTML = newsItems.length ? newsItems.slice(0, 4).map(article => `
+        <div class="d-flex justify-content-between align-items-start py-2 border-bottom border-secondary border-opacity-10">
+          <div>
+            <a class="fw-semibold text-reset text-decoration-none" href="/pages/content-detail.html?type=news&id=${encodeURIComponent(article._id)}">${article.title || 'Cyber security update'}</a>
+            <div class="small text-secondary">${article.summary || article.content?.slice(0, 120) || 'Read the latest advisory.'}</div>
+          </div>
+          <span class="badge bg-danger-subtle text-danger small">${article.category || 'Security'}</span>
+        </div>
+      `).join('') : '<p class="text-secondary mb-0">No cyber crime news available yet.</p>';
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

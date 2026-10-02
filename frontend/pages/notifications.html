@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications - CyberShield 360</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Security Alerts</h1>
+      <p>Stay updated with breach alerts, scam warnings, and important government advisories.</p>
+    </div>
+    <div class="glass-card p-4" id="notificationList"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    (function () {
+      if (!requireAuth()) return;
+      document.getElementById('navbar-container').innerHTML = renderNavbar(true);
+      document.getElementById('sidebar-container').innerHTML = renderSidebar('notifications');
+      initPage();
+
+      async function loadNotifications() {
+        showLoading();
+        const result = await apiGet(ENDPOINTS.NOTIFICATIONS);
+        hideLoading();
+        const list = document.getElementById('notificationList');
+        if (!result.success) {
+          list.innerHTML = `<p class="text-secondary">${result.message || 'Notifications are unavailable.'}</p>`;
+          return;
+        }
+        const items = result.data.items || [];
+        list.innerHTML = items.length ? items.map(item => `
+          <div class="border-bottom border-secondary border-opacity-10 py-3">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+              <div>
+                <h6 class="mb-1">${item.title || 'Security notification'}</h6>
+                <p class="text-secondary small mb-0">${item.message || ''}</p>
+                <span class="small text-secondary">${formatDate(item.created_at)}</span>
+              </div>
+              <span class="badge bg-danger bg-opacity-25 text-danger">${item.priority || 'medium'}</span>
+            </div>
+          </div>
+        `).join('') : '<p class="text-secondary mb-0">No notifications yet.</p>';
+      }
+
+      loadNotifications();
+    })();
+  </script>
+</body>
+</html>

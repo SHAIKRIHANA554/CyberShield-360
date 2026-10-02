@@ -1,0 +1,403 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - CyberShield 360</title>
+  <meta name="description" content="View and manage your CyberShield 360 profile — track your awareness score, achievements, and account details." />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+  <style>
+    .profile-avatar {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, #C1121F 0%, #8B0000 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; color: #fff; margin: 0 auto 1rem;
+      box-shadow: 0 0 0 4px rgba(193,18,31,0.25);
+      transition: box-shadow 0.3s;
+    }
+    .profile-avatar:hover { box-shadow: 0 0 0 8px rgba(193,18,31,0.2); }
+    .score-ring { position: relative; width: 120px; height: 120px; margin: 0 auto 1rem; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring .ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 8; }
+    .score-ring .ring-fill {
+      fill: none; stroke: #C1121F; stroke-width: 8; stroke-linecap: round;
+      stroke-dasharray: 283; stroke-dashoffset: 283;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .score-ring .ring-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center;
+    }
+    .score-ring .ring-text .score-val { font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1; }
+    .score-ring .ring-text .score-lbl { font-size: 0.65rem; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+    .stat-pill {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem;
+    }
+    .stat-pill .stat-icon {
+      width: 36px; height: 36px; border-radius: 10px; background: rgba(193,18,31,0.15);
+      display: flex; align-items: center; justify-content: center; color: #C1121F; flex-shrink: 0;
+    }
+    .stat-pill .stat-val { font-size: 1.1rem; font-weight: 600; color: #fff; }
+    .stat-pill .stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.45); }
+    .badge-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(193,18,31,0.12); border: 1px solid rgba(193,18,31,0.3);
+      color: #ef5350; border-radius: 20px; padding: 6px 14px;
+      font-size: 0.8rem; font-weight: 500; margin: 4px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .badge-chip:hover { background: rgba(193,18,31,0.22); transform: translateY(-1px); }
+    .tab-nav { display: flex; gap: 4px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem; }
+    .tab-btn {
+      background: none; border: none; color: rgba(255,255,255,0.5);
+      padding: 10px 18px; font-size: 0.87rem; font-weight: 500; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn.active { color: #C1121F; border-bottom-color: #C1121F; }
+    .tab-btn:hover:not(.active) { color: #fff; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .form-control-cyber {
+      background: rgba(255,255,255,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      color: #fff !important; border-radius: 10px; padding: 10px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control-cyber:focus {
+      border-color: #C1121F !important; box-shadow: 0 0 0 3px rgba(193,18,31,0.15) !important; outline: none;
+    }
+    .form-control-cyber::placeholder { color: rgba(255,255,255,0.3); }
+    .form-label-cyber { font-size: 0.82rem; color: rgba(255,255,255,0.55); margin-bottom: 6px; font-weight: 500; display: block; }
+    .btn-save {
+      background: linear-gradient(135deg, #C1121F, #8B0000);
+      border: none; color: #fff; border-radius: 10px; padding: 10px 24px; font-weight: 600;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-save:hover { opacity: 0.9; transform: translateY(-1px); color: #fff; }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .alert-cyber-success {
+      background: rgba(0,200,83,0.1); border: 1px solid rgba(0,200,83,0.25);
+      color: #00C853; border-radius: 10px; padding: 10px 16px; font-size: 0.85rem;
+    }
+    .alert-cyber-error {
+      background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.25);
+      color: #E63946; border-radius: 10px; padding: 10px 16px; font-size: 0.85rem;
+    }
+    .member-since { font-size: 0.78rem; color: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .role-badge {
+      display: inline-block; background: rgba(193,18,31,0.2);
+      border: 1px solid rgba(193,18,31,0.4); color: #ef5350;
+      border-radius: 20px; padding: 2px 12px; font-size: 0.75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;
+    }
+    .empty-badges { color: rgba(255,255,255,0.3); font-size: 0.85rem; text-align: center; padding: 2rem 0; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+  <main class="main-content">
+    <div class="page-header">
+      <h1><i class="fas fa-user-circle me-2 text-danger"></i>My Profile</h1>
+      <p>Track your achievements, security score, and manage your account settings.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="glass-card p-4 text-center mb-4">
+          <div class="profile-avatar" id="avatarIcon"><i class="fas fa-user-shield"></i></div>
+          <div class="role-badge" id="profileRole">User</div>
+          <h4 id="profileName" class="mb-0">Loading...</h4>
+          <p class="text-secondary small mb-2" id="profileEmail"></p>
+          <p class="member-since mb-3"><i class="fas fa-calendar-alt"></i> <span id="profileJoined">-</span></p>
+          <div class="score-ring mb-1">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="45"/>
+              <circle class="ring-fill" id="scoreRing" cx="60" cy="60" r="45"/>
+            </svg>
+            <div class="ring-text">
+              <div class="score-val" id="profileScore">0%</div>
+              <div class="score-lbl">SCORE</div>
+            </div>
+          </div>
+          <p class="small text-secondary mb-3">Awareness Score</p>
+          <div class="d-flex flex-column gap-2 mt-3">
+            <div class="stat-pill">
+              <div class="stat-icon"><i class="fas fa-shield-alt fa-sm"></i></div>
+              <div><div class="stat-val" id="statScans">0</div><div class="stat-lbl">Total Scans</div></div>
+            </div>
+            <div class="stat-pill">
+              <div class="stat-icon"><i class="fas fa-trophy fa-sm"></i></div>
+              <div><div class="stat-val" id="statBadges">0</div><div class="stat-lbl">Badges Earned</div></div>
+            </div>
+            <div class="stat-pill">
+              <div class="stat-icon"><i class="fas fa-check-circle fa-sm"></i></div>
+              <div><div class="stat-val" id="statVerified">-</div><div class="stat-lbl">Account Status</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="glass-card p-4">
+          <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('achievements')" id="tab-achievements"><i class="fas fa-trophy me-1"></i> Achievements</button>
+            <button class="tab-btn" onclick="switchTab('edit')" id="tab-edit"><i class="fas fa-edit me-1"></i> Edit Profile</button>
+            <button class="tab-btn" onclick="switchTab('security')" id="tab-security"><i class="fas fa-lock me-1"></i> Security</button>
+          </div>
+
+          <div class="tab-pane active" id="pane-achievements">
+            <h6 class="text-secondary small mb-3 text-uppercase" style="letter-spacing:1px">Earned Badges</h6>
+            <div id="achievementsContainer">
+              <div class="empty-badges"><i class="fas fa-medal fa-2x mb-2 d-block"></i>No badges yet. Complete scans and quizzes to earn them!</div>
+            </div>
+            <hr style="border-color:rgba(255,255,255,0.08)" class="my-4"/>
+            <h6 class="text-secondary small mb-3 text-uppercase" style="letter-spacing:1px">How to Earn Badges</h6>
+            <div class="row g-2">
+              <div class="col-6 col-md-4">
+                <div class="stat-pill"><div class="stat-icon"><i class="fas fa-link fa-xs"></i></div><div><div class="stat-lbl">Scan a URL</div><div class="stat-val" style="font-size:0.8rem">+XP</div></div></div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-pill"><div class="stat-icon"><i class="fas fa-brain fa-xs"></i></div><div><div class="stat-lbl">Take a Quiz</div><div class="stat-val" style="font-size:0.8rem">+XP</div></div></div>
+              </div>
+              <div class="col-6 col-md-4">
+                <div class="stat-pill"><div class="stat-icon"><i class="fas fa-graduation-cap fa-xs"></i></div><div><div class="stat-lbl">Complete Lesson</div><div class="stat-val" style="font-size:0.8rem">+XP</div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="pane-edit">
+            <div id="edit-msg" class="mb-3" style="display:none"></div>
+            <form id="editProfileForm" onsubmit="handleEditProfile(event)">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-cyber" for="editName">Full Name</label>
+                  <input type="text" class="form-control form-control-cyber" id="editName" placeholder="Your full name" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-cyber" for="editPhone">Phone Number</label>
+                  <input type="tel" class="form-control form-control-cyber" id="editPhone" placeholder="+91 XXXXX XXXXX" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label-cyber" for="editBio">Bio</label>
+                  <textarea class="form-control form-control-cyber" id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                </div>
+              </div>
+              <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn-save btn" id="saveProfileBtn"><i class="fas fa-save me-2"></i>Save Changes</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="resetEditForm()">Reset</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="tab-pane" id="pane-security">
+            <div id="pwd-msg" class="mb-3" style="display:none"></div>
+            <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
+              <div class="d-flex flex-column gap-3" style="max-width:440px">
+                <div>
+                  <label class="form-label-cyber" for="currentPassword">Current Password</label>
+                  <div class="position-relative">
+                    <input type="password" class="form-control form-control-cyber" id="currentPassword" placeholder="Enter current password" required />
+                    <button type="button" class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y pe-3" onclick="togglePwd('currentPassword', this)" style="background:none;border:none"><i class="fas fa-eye"></i></button>
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label-cyber" for="newPassword">New Password</label>
+                  <div class="position-relative">
+                    <input type="password" class="form-control form-control-cyber" id="newPassword" placeholder="Min 8 chars, uppercase + number" required />
+                    <button type="button" class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y pe-3" onclick="togglePwd('newPassword', this)" style="background:none;border:none"><i class="fas fa-eye"></i></button>
+                  </div>
+                </div>
+                <div>
+                  <label class="form-label-cyber" for="confirmNewPassword">Confirm New Password</label>
+                  <div class="position-relative">
+                    <input type="password" class="form-control form-control-cyber" id="confirmNewPassword" placeholder="Repeat new password" required />
+                    <button type="button" class="btn btn-link text-secondary position-absolute end-0 top-50 translate-middle-y pe-3" onclick="togglePwd('confirmNewPassword', this)" style="background:none;border:none"><i class="fas fa-eye"></i></button>
+                  </div>
+                </div>
+                <div>
+                  <button type="submit" class="btn-save btn" id="changePwdBtn"><i class="fas fa-key me-2"></i>Change Password</button>
+                </div>
+              </div>
+            </form>
+            <hr style="border-color:rgba(255,255,255,0.08)" class="my-4"/>
+            <h6 class="text-secondary small mb-2 text-uppercase" style="letter-spacing:1px">Account Actions</h6>
+            <button class="btn btn-outline-danger btn-sm" onclick="confirmLogout()"><i class="fas fa-sign-out-alt me-1"></i> Logout All Devices</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    (function() { if (!requireAuth()) return; })();
+    document.getElementById('navbar-container').innerHTML = renderNavbar(true);
+    document.getElementById('sidebar-container').innerHTML = renderSidebar('profile');
+    initPage();
+
+    var _userData = null;
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+      document.getElementById('tab-' + name).classList.add('active');
+      document.getElementById('pane-' + name).classList.add('active');
+    }
+
+    function togglePwd(inputId, btn) {
+      var input = document.getElementById(inputId);
+      var icon = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    function animateScoreRing(score) {
+      var circumference = 283;
+      var offset = circumference - (score / 100) * circumference;
+      var ring = document.getElementById('scoreRing');
+      if (ring) ring.style.strokeDashoffset = offset;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '-';
+      return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function showMsg(id, msg, isError) {
+      var el = document.getElementById(id);
+      el.style.display = 'block';
+      el.className = isError ? 'alert-cyber-error mb-3' : 'alert-cyber-success mb-3';
+      el.innerHTML = '<i class="fas ' + (isError ? 'fa-exclamation-circle' : 'fa-check-circle') + ' me-2"></i>' + msg;
+    }
+    function hideMsg(id) {
+      var el = document.getElementById(id);
+      if (el) { el.style.display = 'none'; el.textContent = ''; }
+    }
+
+    async function loadProfile() {
+      showLoading();
+      var result = await apiGet(ENDPOINTS.PROFILE);
+      hideLoading();
+      if (!result.success) {
+        Swal.fire({ icon: 'error', title: 'Error', text: result.message || 'Failed to load profile', background: '#141A26', color: '#fff' });
+        return;
+      }
+      _userData = result.data;
+      var user = _userData;
+      document.getElementById('profileName').textContent = user.name || 'User';
+      document.getElementById('profileEmail').textContent = user.email || '';
+      var role = user.role || 'user';
+      document.getElementById('profileRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+      document.getElementById('profileJoined').textContent = 'Member since ' + fmtDate(user.created_at);
+      var score = user.awareness_score || 0;
+      document.getElementById('profileScore').textContent = score + '%';
+      setTimeout(function(){ animateScoreRing(score); }, 200);
+      document.getElementById('statScans').textContent = user.total_scans !== undefined ? user.total_scans : 0;
+      var badges = Array.isArray(user.badges) ? user.badges : [];
+      document.getElementById('statBadges').textContent = badges.length;
+      var verifiedEl = document.getElementById('statVerified');
+      verifiedEl.textContent = user.is_verified ? 'Verified' : 'Unverified';
+      verifiedEl.style.color = user.is_verified ? '#00C853' : '#FFC107';
+      var initials = (user.name || 'U').split(' ').map(function(n){ return n[0]; }).join('').toUpperCase().slice(0, 2);
+      document.getElementById('avatarIcon').innerHTML = '<span style="font-size:1.8rem;font-weight:700;font-family:Poppins,sans-serif">' + initials + '</span>';
+      if (badges.length > 0) {
+        var icons = { 'First Scan': 'fa-shield-alt', 'Security Learner': 'fa-graduation-cap', 'Quiz Master': 'fa-brain', 'Threat Hunter': 'fa-crosshairs' };
+        document.getElementById('achievementsContainer').innerHTML = badges.map(function(b){
+          var icon = icons[b] || 'fa-medal';
+          return '<span class="badge-chip"><i class="fas ' + icon + ' fa-xs"></i>' + b + '</span>';
+        }).join('');
+      }
+      document.getElementById('editName').value = user.name || '';
+      document.getElementById('editPhone').value = user.phone || '';
+      document.getElementById('editBio').value = user.bio || '';
+    }
+
+    function resetEditForm() {
+      if (_userData) {
+        document.getElementById('editName').value = _userData.name || '';
+        document.getElementById('editPhone').value = _userData.phone || '';
+        document.getElementById('editBio').value = _userData.bio || '';
+      }
+      hideMsg('edit-msg');
+    }
+
+    async function handleEditProfile(e) {
+      e.preventDefault();
+      hideMsg('edit-msg');
+      var btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+      var payload = {
+        name: document.getElementById('editName').value.trim(),
+        phone: document.getElementById('editPhone').value.trim(),
+        bio: document.getElementById('editBio').value.trim()
+      };
+      var result = await apiPut(ENDPOINTS.PROFILE, payload);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-save me-2"></i>Save Changes';
+      if (result.success) {
+        _userData = result.data;
+        document.getElementById('profileName').textContent = result.data.name || 'User';
+        try {
+          var stored = JSON.parse(localStorage.getItem('user') || '{}');
+          stored.name = result.data.name;
+          localStorage.setItem('user', JSON.stringify(stored));
+        } catch(_) {}
+        showMsg('edit-msg', 'Profile updated successfully!', false);
+      } else {
+        showMsg('edit-msg', result.message || 'Failed to update profile', true);
+      }
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      hideMsg('pwd-msg');
+      var current = document.getElementById('currentPassword').value;
+      var newPwd = document.getElementById('newPassword').value;
+      var confirm = document.getElementById('confirmNewPassword').value;
+      if (newPwd !== confirm) {
+        showMsg('pwd-msg', 'New passwords do not match', true);
+        return;
+      }
+      var btn = document.getElementById('changePwdBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Changing...';
+      var result = await apiPost(ENDPOINTS.CHANGE_PASSWORD, { current_password: current, new_password: newPwd });
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-key me-2"></i>Change Password';
+      if (result.success) {
+        document.getElementById('changePasswordForm').reset();
+        showMsg('pwd-msg', 'Password changed successfully!', false);
+      } else {
+        showMsg('pwd-msg', result.message || 'Failed to change password', true);
+      }
+    }
+
+    function confirmLogout() {
+      Swal.fire({
+        title: 'Logout All Devices?', text: 'You will be signed out.',
+        icon: 'warning', showCancelButton: true,
+        confirmButtonColor: '#C1121F', cancelButtonColor: '#555',
+        confirmButtonText: 'Yes, Logout', background: '#141A26', color: '#fff'
+      }).then(function(r){ if (r.isConfirmed) logout(); });
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

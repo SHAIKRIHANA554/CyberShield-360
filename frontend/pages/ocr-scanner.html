@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCR Scanner - CyberShield 360</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="/assets/css/main.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <div id="sidebar-container"></div>
+  <main class="main-content">
+    <div class="page-header">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h1>OCR Text Extraction</h1>
+          <p>Extract text, URLs, phone numbers, emails, and UPI identifiers from screenshots and documents.</p>
+        </div>
+        <button class="btn btn-outline-light btn-sm" onclick="goBack()"><i class="fas fa-arrow-left me-2"></i>Back</button>
+      </div>
+    </div>
+    <div class="scanner-container glass-card p-4">
+      <div class="upload-zone" id="uploadZone">
+        <i class="fas fa-file-image"></i>
+        <h4 class="mb-2">Upload a screenshot or document image</h4>
+        <input type="file" id="imageInput" accept="image/*" hidden />
+        <button class="btn-cyber"><i class="fas fa-magic me-2"></i>Extract Text</button>
+      </div>
+      <div id="previewContainer" class="mt-4" style="display:none"></div>
+      <div id="resultContainer" class="mt-4"></div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/auth.js"></script>
+  <script src="/assets/js/utils.js"></script>
+  <script src="/assets/js/components.js"></script>
+  <script>
+    document.getElementById('navbar-container').innerHTML = renderNavbar(isLoggedIn());
+    document.getElementById('sidebar-container').innerHTML = renderSidebar('ocr-scanner');
+    initPage();
+    setupFileUpload('uploadZone', 'imageInput', file => {
+      previewImage(file, 'previewContainer');
+      analyzeOcr(file);
+    });
+
+    async function analyzeOcr(file) {
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('image', file);
+      showLoading();
+      const result = await apiUpload(ENDPOINTS.SCAN_OCR, formData);
+      hideLoading();
+      if (result.success) {
+        const container = document.getElementById('resultContainer');
+        container.innerHTML = `
+          <div class="scan-result">
+            <h5><i class="fas fa-file-alt me-2"></i>OCR Result</h5>
+            <p class="text-secondary">${result.data.text || 'No text extracted.'}</p>
+            <div class="row g-3 mt-2">
+              <div class="col-md-6"><strong>URLs</strong><div class="small text-secondary">${(result.data.urls || []).join(', ') || 'None'}</div></div>
+              <div class="col-md-6"><strong>Emails</strong><div class="small text-secondary">${(result.data.emails || []).join(', ') || 'None'}</div></div>
+              <div class="col-md-6"><strong>Phones</strong><div class="small text-secondary">${(result.data.phones || []).join(', ') || 'None'}</div></div>
+              <div class="col-md-6"><strong>UPI IDs</strong><div class="small text-secondary">${(result.data.upi_ids || []).join(', ') || 'None'}</div></div>
+            </div>
+            ${renderScanResult ? '' : ''}
+          </div>`;
+      } else {
+        Swal.fire({ icon: 'error', title: 'OCR failed', text: result.message, background: '#141A26', color: '#fff' });
+      }
+    }
+  </script>
+</body>
+</html>
