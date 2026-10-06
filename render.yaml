@@ -19,7 +19,7 @@ services:
       - key: MONGO_URI
         sync: false
       - key: MONGO_DB_NAME
-        value: cybershield360
+        value: shaikrihana554_db_user
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
