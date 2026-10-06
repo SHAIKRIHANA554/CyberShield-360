@@ -657,7 +657,11 @@ class TextAnalyzerService:
             ),
             "model": "ML + NLP Pattern Analysis",
             "score": round(score, 2),
-            "ml_prediction": ml_prediction,
+            "ml_prediction": (
+                int(ml_prediction)
+                if ml_prediction is not None
+                else None
+            ),
             "ml_confidence": round(
                 ml_confidence,
                 2

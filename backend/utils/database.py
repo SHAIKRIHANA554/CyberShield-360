@@ -197,7 +197,7 @@ def init_db(uri: str, db_name: str):
     """Initialize MongoDB connection with an in-memory fallback."""
     global _client, _db, _memory_collections
     try:
-        _client = MongoClient(uri, serverSelectionTimeoutMS=2000)
+        _client = MongoClient(uri, serverSelectionTimeoutMS=8000)
         _client.admin.command('ping')
         _db = _client[db_name]
         print(f"Connected to MongoDB database: {db_name}")

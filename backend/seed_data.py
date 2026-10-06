@@ -29,7 +29,7 @@ def seed_database():
             "awareness_score": 100,
             "is_verified": True
         })
-        print(f"✓ Admin user created ({admin_email})")
+        print(f"[OK] Admin user created ({admin_email})")
     elif not admin_email or not admin_password:
         print("Admin bootstrap skipped; set ADMIN_EMAIL and ADMIN_PASSWORD to create an admin account.")
 
@@ -95,7 +95,7 @@ def seed_database():
         ]
         for item in news_items:
             NewsModel.create(item)
-        print(f"✓ {len(news_items)} real news articles seeded")
+        print(f"[OK] {len(news_items)} real news articles seeded")
 
     # Learning modules
     if get_collection("learning").count_documents({"type": {"$ne": "cyber_law"}}) == 0:
@@ -163,7 +163,7 @@ def seed_database():
         ]
         for mod in modules:
             LearningModel.create(mod)
-        print(f"✓ {len(modules)} learning modules seeded")
+        print(f"[OK] {len(modules)} learning modules seeded")
 
     # Real cyber law and regulatory content
     if get_collection("learning").count_documents({"type": "cyber_law"}) == 0:
@@ -219,7 +219,7 @@ def seed_database():
         ]
         for law in laws:
             LearningModel.create(law)
-        print(f"✓ {len(laws)} real cyber law entries seeded")
+        print(f"[OK] {len(laws)} real cyber law entries seeded")
 
     # Quizzes
     if get_collection("quiz").count_documents({}) == 0:
@@ -318,7 +318,7 @@ def seed_database():
         ]
         for quiz in quizzes:
             QuizModel.create(quiz)
-        print(f"✓ {len(quizzes)} quizzes seeded")
+        print(f"[OK] {len(quizzes)} quizzes seeded")
 
     # Notifications
     if get_collection("notifications").count_documents({}) == 0:
@@ -354,6 +354,6 @@ def seed_database():
         ]
         for alert in alerts:
             NotificationModel.create(alert)
-        print(f"✓ {len(alerts)} notifications seeded")
+        print(f"[OK] {len(alerts)} notifications seeded")
 
     print("Database seeding complete!")
